@@ -152,8 +152,8 @@ function fb(s){if(!s)return 0;const v=parseFloat(s);if(s.includes('TB'))return v
 function openDonasi(){document.getElementById('donasi-modal').classList.add('active')}
 function closeDonasi(){document.getElementById('donasi-modal').classList.remove('active')}
 document.getElementById('donasi-modal').addEventListener('click',function(e){if(e.target===this)closeDonasi()});
-function fixNavLinks(){const ip=document.getElementById('ip').textContent;if(ip&&ip!='N/A'&&ip!='-'){document.getElementById('nav-files').href='http://'+ip+':8081';document.getElementById('nav-nvr').href='http://'+ip+':8765';document.getElementById('nav-status').href='http://'+ip+':7681'}}
-updateStats();setInterval(updateStats,3000);setTimeout(fixNavLinks,500);
+function fixNavLinks(){var h=window.location.hostname||'localhost';document.getElementById('nav-files').href='http://'+h+':8081';document.getElementById('nav-nvr').href='http://'+h+':8765';document.getElementById('nav-status').href='http://'+h+':7681'}
+updateStats();setInterval(updateStats,3000);fixNavLinks();
 </script>
 </body>
 </html>
