@@ -19,6 +19,7 @@ services:
       - /:/host/root:ro
       - /etc/hostname:/host/etc/hostname:ro
       - /storage/Blog:/app/blog_content:ro
+      - ./dashboard/templates:/app/templates:ro
     environment:
       - HOST_PREFIX=/host
       - TZ=${TZ:-Asia/Jakarta}
@@ -36,6 +37,7 @@ services:
       - /storage:/srv
       - ./configs/filebrowser.json:/config/settings.json:ro
       - ./configs/filebrowser-data:/database
+      - ./dashboard/templates:/srv/Dashboard:ro
     mem_limit: 64m
     <<: [*restart, *network]
 
