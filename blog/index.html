@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog - My Home Server</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e6ed;padding:20px}
+.container{max-width:800px;margin:0 auto}
+.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#131a2b,#1a2340);border-radius:16px;margin-bottom:24px;border:1px solid #1e2a45}
+.header h1{font-size:1.5em;background:linear-gradient(135deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .nav-link{display:inline-block;margin-top:10px;color:#00d4ff;text-decoration:none;font-size:.85em}
+.header .nav-link:hover{color:#00ff88}
+.post{background:#131a2b;border-radius:14px;padding:24px;margin-bottom:16px;border:1px solid #1e2a45}
+.post h2{font-size:1.15em;margin-bottom:8px;color:#00d4ff}
+.post .date{font-size:.78em;color:#5a6a8a;margin-bottom:12px}
+.post p{font-size:.9em;line-height:1.7;color:#c0c8d6}
+.post ul{font-size:.9em;line-height:1.7;color:#c0c8d6;padding-left:20px}
+.footer{text-align:center;padding:20px;color:#5a6a8a;font-size:.8em}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Catatan Perjalanan</h1>
+<p style="color:#8892a4;font-size:.85em;margin-top:6px">My Home Server - STB B860H</p>
+<a class="nav-link" href="/">&larr; Kembali ke Dashboard</a>
+</div>
+<div class="post">
+<h2>Selamat Datang di My Home Server</h2>
+<div class="date">13 Juni 2026</div>
+<p>STB B860H dengan eMMC rusak berfungsi penuh sebagai server rumahan. Berkat Docker, semua layanan berjalan di container terisolasi tanpa dependency conflict.</p>
+<p style="margin-top:10px">Spesifikasi:</p>
+<ul style="margin-top:6px">
+<li><strong>SOC:</strong> Amlogic S905X (ARM Cortex-A53)</li>
+<li><strong>RAM:</strong> 1 GB DDR3 + ZRAM 512MB + SWAP 2GB</li>
+<li><strong>Penyimpanan:</strong> SD Card</li>
+<li><strong>Sistem:</strong> Armbian + Docker</li>
+</ul>
+</div>
+<div class="post">
+<h2>Layanan Berjalan di Docker</h2>
+<div class="date">13 Juni 2026</div>
+<ul>
+<li><strong>Dashboard Monitor</strong> - Flask container (port 8080)</li>
+<li><strong>FileBrowser</strong> - filebrowser/filebrowser (port 8081)</li>
+<li><strong>CCTV NVR</strong> - ccrisan/motioneye (port 8765)</li>
+<li><strong>Cloudflare Tunnel</strong> - cloudflare/cloudflared</li>
+<li><strong>Terminal</strong> - tsl0922/ttyd + btop (port 7681)</li>
+</ul>
+</div>
+<div class="post">
+<h2>Mengelola Container</h2>
+<div class="date">13 Juni 2026</div>
+<p>Semua service dikelola via docker-compose di /opt/homeserver:</p>
+<ul>
+<li><code>docker-compose ps</code> - lihat status container</li>
+<li><code>docker-compose logs -f</code> - lihat log real-time</li>
+<li><code>docker-compose restart [service]</code> - restart service tertentu</li>
+<li><code>docker-compose pull</code> - update semua image</li>
+</ul>
+</div>
+<div class="footer"><p>My Home Server &mdash; Dibuat dengan penuh dedikasi</p></div>
+</div>
+</body>
+</html>

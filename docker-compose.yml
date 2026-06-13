@@ -1,0 +1,87 @@
+version: "3.9"
+
+x-restart: &restart
+  restart: unless-stopped
+
+x-network: &network
+  networks:
+    - homeserver
+
+services:
+  # ==========================================
+  # DASHBOARD MONITOR + BLOG
+  # ==========================================
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8080:8080"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro
+      - /etc/hostname:/host/etc/hostname:ro
+    environment:
+      - HOST_PREFIX=/host
+      - TZ=${TZ:-Asia/Jakarta}
+    mem_limit: 128m
+    <<: [*restart, *network]
+
+  # ==========================================
+  # FILEBROWSER
+  # ==========================================
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    ports:
+      - "8081:80"
+    volumes:
+      - /storage:/srv
+      - ./configs/filebrowser.json:/.filebrowser.json:ro
+      - ./configs/filebrowser-data:/database
+    environment:
+      - FB_BASEURL=/srv
+    mem_limit: 64m
+    <<: [*restart, *network]
+
+  # ==========================================
+  # CCTV NVR (motionEye)
+  # ==========================================
+  motioneye:
+    image: ccrisan/motioneye:master-arm64
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./configs/motioneye:/etc/motioneye
+      - /storage/My Videos/NVR:/var/lib/motioneye
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=${TZ:-Asia/Jakarta}
+    mem_limit: 256m
+    privileged: true
+    <<: [*restart, *network]
+
+  # ==========================================
+  # CLOUDFLARE TUNNEL
+  # ==========================================
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    volumes:
+      - ./configs/cloudflared:/home/nonroot/.cloudflared
+    mem_limit: 64m
+    <<: [*restart, *network]
+
+  # ==========================================
+  # TTYD + BTOP (Terminal via Web)
+  # ==========================================
+  ttyd:
+    image: tsl0922/ttyd:latest
+    command: ttyd -p 7681 -c ${TTYD_USER:-admin}:${TTYD_PASS:-moch1234} btop
+    ports:
+      - "7681:7681"
+    pid: "host"
+    mem_limit: 64m
+    <<: [*restart, *network]
+
+networks:
+  homeserver:
+    driver: bridge
