@@ -6,54 +6,75 @@
 <title>Blog - My Home Server</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e6ed;padding:20px}
-.container{max-width:800px;margin:0 auto}
-.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#131a2b,#1a2340);border-radius:16px;margin-bottom:24px;border:1px solid #1e2a45}
-.header h1{font-size:1.5em;background:linear-gradient(135deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header .sub{color:#8892a4;font-size:.85em;margin-top:6px}
-.nav-link{display:inline-block;margin-top:10px;color:#00d4ff;text-decoration:none;font-size:.85em}
-.nav-link:hover{color:#00ff88}
-.manage-link{display:inline-block;margin-left:16px;color:#ffd93d;text-decoration:none;font-size:.82em}
-.manage-link:hover{color:#ffed7a}
-.post{background:#131a2b;border-radius:14px;padding:24px;margin-bottom:16px;border:1px solid #1e2a45;transition:border-color .2s}
-.post:hover{border-color:#00d4ff}
-.post h2{font-size:1.15em;margin-bottom:6px}
-.post h2 a{color:#00d4ff;text-decoration:none}
-.post h2 a:hover{color:#00ff88}
-.post .date{font-size:.78em;color:#5a6a8a;margin-bottom:8px}
-.post p{font-size:.9em;line-height:1.7;color:#c0c8d6}
-.empty{text-align:center;color:#5a6a8a;padding:40px;font-size:.9em}
-.empty .tip{color:#8892a4;margin-top:10px;font-size:.85em}
-.footer{text-align:center;padding:20px;color:#5a6a8a;font-size:.8em}
-@media(max-width:600px){body{padding:12px}.header{padding:20px 14px}.header h1{font-size:1.2em}.post{padding:16px}}
+body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:#080c18;color:#e2e8f0;min-height:100vh}
+.container{max-width:860px;margin:0 auto;padding:32px 20px}
+header{text-align:center;margin-bottom:48px}
+header h1{font-size:2rem;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#60a5fa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{color:#64748b;font-size:.9rem;margin-top:8px}
+header nav{margin-top:18px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+header nav a{color:#94a3b8;text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;transition:all .2s;border:1px solid transparent}
+header nav a:hover{color:#60a5fa;border-color:#1e293b;background:#0f1729}
+header nav a.manage{color:#fbbf24}
+header nav a.manage:hover{color:#fcd34d;border-color:#1e293b}
+.posts{display:flex;flex-direction:column;gap:16px}
+.post-card{background:linear-gradient(145deg,#0f1729,#0a0f1e);border-radius:16px;padding:28px;border:1px solid #1e293b;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.post-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#60a5fa,#34d399,transparent);opacity:0;transition:opacity .3s}
+.post-card:hover{transform:translateY(-3px);border-color:#334155;box-shadow:0 12px 40px rgba(96,165,250,.06)}
+.post-card:hover::before{opacity:1}
+.post-card .meta{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:.78rem;color:#64748b}
+.post-card .meta .date{display:flex;align-items:center;gap:4px}
+.post-card .meta .read-time{display:flex;align-items:center;gap:4px}
+.post-card h2{font-size:1.15rem;font-weight:600;margin-bottom:10px;line-height:1.4}
+.post-card h2 a{color:#e2e8f0;text-decoration:none;transition:color .2s}
+.post-card h2 a:hover{color:#60a5fa}
+.post-card .excerpt{color:#94a3b8;font-size:.88rem;line-height:1.7}
+.post-card .excerpt p{display:inline}
+.empty{text-align:center;padding:60px 20px;background:#0f1729;border-radius:16px;border:1px solid #1e293b}
+.empty .icon{font-size:3rem;margin-bottom:12px}
+.empty p{color:#64748b;font-size:.9rem}
+.empty .tip{color:#94a3b8;font-size:.82rem;margin-top:8px}
+footer{text-align:center;padding:32px 20px 16px;color:#475569;font-size:.78rem;border-top:1px solid #1e293b;margin-top:48px}
+footer a{color:#64748b;text-decoration:none}
+footer a:hover{color:#60a5fa}
+@media(max-width:640px){.container{padding:20px 14px}header h1{font-size:1.5rem}.post-card{padding:20px}.post-card h2{font-size:1rem}}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<h1>Blog</h1>
-<div class="sub">Catatan dan tutorial My Home Server</div>
-<a class="nav-link" href="/">&larr; Dashboard</a>
-<a class="manage-link" id="manage-link" href="#" target="_blank">&#9998; Kelola via FileBrowser</a>
-</div>
+<header>
+<h1>&#128221; Blog</h1>
+<div class="sub">Catatan, tutorial, dan cerita seputar My Home Server</div>
+<nav>
+<a href="/">&#8592; Dashboard</a>
+<a class="manage" id="manage-link" href="#" target="_blank">&#9998; Kelola via FileBrowser</a>
+</nav>
+</header>
 {% if posts %}
+<div class="posts">
 {% for p in posts %}
-<div class="post">
-<h2><a href="/blog/{{ p.slug }}">{{ p.title }}</a></h2>
-<div class="date">{{ p.date }}</div>
-{{ p.html|safe|truncate(300) }}
+<article class="post-card" onclick="location.href='/blog/{{ p.slug }}'">
+<div class="meta">
+<span class="date">&#128197; {{ p.date }}</span>
+<span class="read-time">&#128337; {{ p.read_time }} menit</span>
 </div>
+<h2><a href="/blog/{{ p.slug }}">{{ p.title }}</a></h2>
+<div class="excerpt">{{ p.html|striptags|truncate(250) }}</div>
+</article>
 {% endfor %}
+</div>
 {% else %}
 <div class="empty">
-Belum ada postingan.
-<div class="tip">Buat file .md di folder Blog via FileBrowser untuk menambah postingan.</div>
+<div class="icon">&#128221;</div>
+<p>Belum ada catatan.</p>
+<div class="tip">Buat file .md di folder Blog lewat FileBrowser untuk memulai.</div>
 </div>
 {% endif %}
-<div class="footer"><p>My Home Server &mdash; Kelola postingan via FileBrowser</p></div>
+<footer>
+<p>My Home Server &mdash; <a href="#" id="manage-link-footer">Kelola via FileBrowser</a></p>
+</footer>
 </div>
 <script>
-(function(){var h=window.location.hostname||'localhost';document.getElementById('manage-link').href='http://'+h+':8081/Blog'})();
+(function(){var h=window.location.hostname||'localhost';var u='http://'+h+':8081/Blog';document.getElementById('manage-link').href=u;var f=document.getElementById('manage-link-footer');if(f)f.href=u})();
 </script>
 </body>
 </html>

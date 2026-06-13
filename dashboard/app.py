@@ -212,7 +212,7 @@ def parse_post(filepath):
             title = line[2:].strip()
             body = '\n'.join(lines[i+1:])
             break
-    html = markdown.markdown(body, extensions=['fenced_code', 'codehilite'])
+    html = markdown.markdown(body, extensions=['fenced_code'])
     return {'title': title, 'html': html, 'slug': os.path.splitext(os.path.basename(filepath))[0]}
 
 def get_posts():
@@ -221,7 +221,10 @@ def get_posts():
     for fp in sorted(glob.glob(pattern), key=os.path.getmtime, reverse=True):
         p = parse_post(fp)
         if p:
-            p['date'] = time.strftime('%d %B %Y', time.localtime(os.path.getmtime(fp)))
+            mtime = os.path.getmtime(fp)
+            p['date'] = time.strftime('%d %B %Y', time.localtime(mtime))
+            words = len(p['html'].split())
+            p['read_time'] = max(1, round(words / 200))
             posts.append(p)
     return posts
 
@@ -237,7 +240,9 @@ def blog_post(slug):
     p = parse_post(fp)
     if not p:
         abort(404)
-    p['date'] = time.strftime('%d %B %Y', time.localtime(os.path.getmtime(fp)))
+    mtime = os.path.getmtime(fp)
+    p['date'] = time.strftime('%d %B %Y', time.localtime(mtime))
+    p['read_time'] = max(1, round(len(p['html'].split()) / 200))
     return render_template('blog_post.html', post=p)
 
 if __name__ == '__main__':

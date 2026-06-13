@@ -6,41 +6,58 @@
 <title>{{ post.title }} - My Home Server</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e6ed;padding:20px}
-.container{max-width:800px;margin:0 auto}
-.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#131a2b,#1a2340);border-radius:16px;margin-bottom:24px;border:1px solid #1e2a45}
-.header h1{font-size:1.5em;background:linear-gradient(135deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header .date{color:#5a6a8a;font-size:.82em;margin-top:8px}
-.nav-link{display:inline-block;margin-top:10px;color:#00d4ff;text-decoration:none;font-size:.85em}
-.nav-link:hover{color:#00ff88}
-.content{background:#131a2b;border-radius:14px;padding:30px;border:1px solid #1e2a45;line-height:1.8;font-size:.95em;color:#c0c8d6}
-.content h2{color:#00d4ff;font-size:1.2em;margin:24px 0 12px}
-.content h3{color:#e0e6ed;font-size:1.05em;margin:20px 0 10px}
-.content p{margin-bottom:14px}
-.content ul,.content ol{padding-left:24px;margin-bottom:14px}
-.content li{margin-bottom:6px}
-.content code{background:#1a2340;padding:2px 6px;border-radius:4px;font-size:.9em;color:#00ff88}
-.content pre{background:#0f1625;padding:16px;border-radius:10px;overflow-x:auto;border:1px solid #1e2a45;margin-bottom:16px}
-.content pre code{background:none;padding:0;color:#c0c8d6}
-.content a{color:#00d4ff}
-.content a:hover{color:#00ff88}
-.content blockquote{border-left:3px solid #00d4ff;padding:10px 16px;margin:14px 0;background:#0f1625;border-radius:0 8px 8px 0;color:#8892a4}
-.content img{max-width:100%;border-radius:8px;margin:14px 0}
-.footer{text-align:center;padding:20px;color:#5a6a8a;font-size:.8em}
-@media(max-width:600px){body{padding:12px}.header{padding:20px 14px}.header h1{font-size:1.2em}.content{padding:16px;font-size:.9em}}
+body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:#080c18;color:#e2e8f0;min-height:100vh}
+.container{max-width:740px;margin:0 auto;padding:32px 20px}
+header{margin-bottom:40px}
+header .back{display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-size:.85rem;padding:8px 14px;border-radius:8px;border:1px solid #1e293b;transition:all .2s;margin-bottom:20px}
+header .back:hover{color:#60a5fa;border-color:#334155;background:#0f1729}
+header h1{font-size:1.8rem;font-weight:700;letter-spacing:-.5px;line-height:1.3;background:linear-gradient(135deg,#e2e8f0,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .meta{display:flex;align-items:center;gap:16px;margin-top:14px;font-size:.82rem;color:#64748b;flex-wrap:wrap}
+header .meta span{display:flex;align-items:center;gap:5px}
+article{background:linear-gradient(145deg,#0f1729,#0a0f1e);border-radius:16px;padding:40px;border:1px solid #1e293b}
+article h2{color:#60a5fa;font-size:1.25rem;font-weight:600;margin:32px 0 12px;line-height:1.4}
+article h3{color:#cbd5e1;font-size:1.1rem;font-weight:600;margin:28px 0 10px}
+article h4{color:#94a3b8;font-size:1rem;font-weight:600;margin:24px 0 8px}
+article p{font-size:.95rem;line-height:1.8;color:#cbd5e1;margin-bottom:18px}
+article ul,article ol{padding-left:24px;margin-bottom:18px;font-size:.95rem;line-height:1.8;color:#cbd5e1}
+article li{margin-bottom:6px}
+article strong{color:#f1f5f9}
+article a{color:#60a5fa;text-decoration:none;border-bottom:1px solid transparent;transition:all .2s}
+article a:hover{border-bottom-color:#60a5fa}
+article code{background:#1e293b;padding:3px 8px;border-radius:6px;font-size:.88em;color:#34d399;font-family:'JetBrains Mono','Fira Code',monospace}
+article pre{background:#050914;padding:20px;border-radius:12px;overflow-x:auto;border:1px solid #1e293b;margin-bottom:20px;position:relative}
+article pre code{background:none;padding:0;color:#e2e8f0;font-size:.85rem;line-height:1.6}
+article blockquote{border-left:3px solid #60a5fa;padding:14px 20px;margin:20px 0;background:#0a0f1e;border-radius:0 10px 10px 0;color:#94a3b8;font-style:italic}
+article img{max-width:100%;border-radius:10px;margin:20px 0;border:1px solid #1e293b}
+article hr{border:none;height:1px;background:#1e293b;margin:32px 0}
+article table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.9rem}
+article th,article td{padding:10px 14px;text-align:left;border:1px solid #1e293b}
+article th{background:#0a0f1e;color:#60a5fa;font-weight:600}
+article td{color:#94a3b8}
+footer{text-align:center;padding:32px 20px 16px;color:#475569;font-size:.78rem;margin-top:40px}
+footer a{color:#64748b;text-decoration:none}
+footer a:hover{color:#60a5fa}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){.container{padding:20px 14px}header h1{font-size:1.35rem}article{padding:20px;font-size:.92rem}article h2{font-size:1.1rem}article pre{padding:14px}}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
+<header class="fade-in">
+<a class="back" href="/blog">&#8592; Kembali ke Blog</a>
 <h1>{{ post.title }}</h1>
-<div class="date">{{ post.date }}</div>
-<a class="nav-link" href="/blog">&larr; Semua Postingan</a>
+<div class="meta">
+<span>&#128197; {{ post.date }}</span>
+<span>&#128337; {{ post.read_time }} menit baca</span>
 </div>
-<div class="content">
+</header>
+<article class="fade-in" style="animation-delay:.1s">
 {{ post.html|safe }}
-</div>
-<div class="footer"><p>My Home Server</p></div>
+</article>
+<footer>
+<p>My Home Server &mdash; <a href="/blog">Kembali ke Blog</a></p>
+</footer>
 </div>
 </body>
 </html>
