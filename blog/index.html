@@ -3,65 +3,851 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog - My Home Server</title>
+<title>My Mini Blog</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e6ed;padding:20px}
-.container{max-width:800px;margin:0 auto}
-.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#131a2b,#1a2340);border-radius:16px;margin-bottom:24px;border:1px solid #1e2a45}
-.header h1{font-size:1.5em;background:linear-gradient(135deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header .nav-link{display:inline-block;margin-top:10px;color:#00d4ff;text-decoration:none;font-size:.85em}
-.header .nav-link:hover{color:#00ff88}
-.post{background:#131a2b;border-radius:14px;padding:24px;margin-bottom:16px;border:1px solid #1e2a45}
-.post h2{font-size:1.15em;margin-bottom:8px;color:#00d4ff}
-.post .date{font-size:.78em;color:#5a6a8a;margin-bottom:12px}
-.post p{font-size:.9em;line-height:1.7;color:#c0c8d6}
-.post ul{font-size:.9em;line-height:1.7;color:#c0c8d6;padding-left:20px}
-.footer{text-align:center;padding:20px;color:#5a6a8a;font-size:.8em}
+:root { --bg: #f8f9fa; --bg-card: #fff; --text: #1a1a2e; --text-secondary: #555; --text-muted: #999; --nav-bg: #fff; --nav-text: #1a1a2e; --accent: #4f46e5; --accent-hover: #4338ca; --accent-light: #eef2ff; --secondary: #6b7280; --secondary-hover: #4b5563; --border: #e5e7eb; --shadow: rgba(0,0,0,.06); --overlay: rgba(0,0,0,.4); --toast-bg: #1f2937; --toast-text: #fff; --code-bg: #f1f5f9; --blockquote-border: #4f46e5; --blockquote-bg: #eef2ff; --preview-bg: #fafafa; --editor-border: #d1d5db; --scrollbar: #d1d5db; }
+[data-theme="dark"] { --bg: #0f172a; --bg-card: #1e293b; --text: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b; --nav-bg: #0f172a; --nav-text: #e2e8f0; --accent: #818cf8; --accent-hover: #6366f1; --accent-light: #1e1b4b; --secondary: #475569; --secondary-hover: #64748b; --border: #334155; --shadow: rgba(0,0,0,.2); --overlay: rgba(0,0,0,.6); --toast-bg: #334155; --toast-text: #e2e8f0; --code-bg: #0f172a; --blockquote-border: #818cf8; --blockquote-bg: #1e1b4b; --preview-bg: #162032; --editor-border: #475569; --scrollbar: #475569; }
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--accent); color: #fff; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+
+nav { background: var(--nav-bg); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem; position: sticky; top: 0; z-index: 100; transition: .3s; backdrop-filter: blur(12px); height: 60px; }
+nav h1 { color: var(--nav-text); font-size: 1.3rem; font-weight: 700; cursor: pointer; letter-spacing: -.02em; }
+nav h1 span { color: var(--accent); }
+.nav-right { display: flex; align-items: center; gap: .3rem; }
+.nav-right a, .nav-right button { color: var(--text-secondary); text-decoration: none; padding: .4rem .7rem; border-radius: 8px; font-size: .82rem; transition: .2s; border: none; background: none; cursor: pointer; font-family: inherit; font-weight: 500; }
+.nav-right a:hover, .nav-right button:hover { background: var(--accent-light); color: var(--accent); }
+.theme-btn { font-size: 1rem !important; padding: .4rem .5rem !important; line-height: 1; }
+.nav-badge { background: var(--accent); color: #fff; font-size: .65rem; border-radius: 10px; padding: .1rem .45rem; margin-left: .2rem; font-weight: 600; }
+
+.btn { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-size: .85rem; font-weight: 600; transition: .2s; text-decoration: none; font-family: inherit; line-height: 1; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+.btn-secondary { background: var(--secondary); color: #fff; }
+.btn-secondary:hover { background: var(--secondary-hover); }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: .35rem .75rem; font-size: .78rem; }
+
+.container { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem; }
+.page { display: none; }
+.page.active { display: block; }
+.page-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -.02em; }
+.page-title span { color: var(--accent); }
+
+.card { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid var(--border); transition: .2s; }
+.card:hover { box-shadow: 0 4px 16px var(--shadow); }
+.card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: .3rem; line-height: 1.3; }
+.card-title a { color: var(--text); text-decoration: none; }
+.card-title a:hover { color: var(--accent); }
+.card-meta { font-size: .78rem; color: var(--text-muted); margin-bottom: .7rem; display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.card-excerpt { color: var(--text-secondary); line-height: 1.7; font-size: .9rem; }
+.card-actions { display: flex; gap: .5rem; margin-top: 1rem; flex-wrap: wrap; }
+
+.post-entrance { animation: fadeUp .4s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.post-entrance:nth-child(1) { animation-delay: 0s; }
+.post-entrance:nth-child(2) { animation-delay: .05s; }
+.post-entrance:nth-child(3) { animation-delay: .1s; }
+
+.post-full h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.2; margin-bottom: .4rem; }
+.post-full .meta { font-size: .82rem; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.post-full .content { line-height: 1.85; font-size: 1rem; color: var(--text); }
+.post-full .content p { margin-bottom: 1.1rem; }
+.post-full .content h2 { font-size: 1.4rem; font-weight: 700; margin: 1.8rem 0 .6rem; letter-spacing: -.02em; }
+.post-full .content h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 .5rem; }
+.post-full .content a { color: var(--accent); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.post-full .content a:hover { opacity: .8; }
+.post-full .content blockquote { border-left: 4px solid var(--blockquote-border); background: var(--blockquote-bg); padding: .8rem 1.2rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0; font-style: italic; color: var(--text-secondary); }
+.post-full .content ul, .post-full .content ol { margin-bottom: 1rem; padding-left: 1.6rem; }
+.post-full .content li { margin-bottom: .3rem; }
+.post-full .content img { max-width: 100%; border-radius: 8px; margin: 1rem 0; box-shadow: 0 2px 8px var(--shadow); }
+.post-full .content hr { border: none; height: 1px; background: var(--border); margin: 1.5rem 0; }
+.post-full .content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: .9rem; }
+.post-full .content th, .post-full .content td { border: 1px solid var(--border); padding: .5rem .8rem; text-align: left; }
+.post-full .content th { background: var(--accent-light); font-weight: 600; }
+.post-full .content code { background: var(--code-bg); padding: .15rem .4rem; border-radius: 4px; font-size: .88em; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+.post-full .content pre { background: var(--code-bg); padding: 1rem 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; margin-bottom: 1rem; border: 1px solid var(--border); position: relative; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.5; }
+.post-full .content pre code { background: none; padding: 0; }
+.copy-btn { position: absolute; top: .5rem; right: .5rem; background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: .2rem .6rem; font-size: .72rem; cursor: pointer; opacity: 0; transition: .2s; font-family: inherit; }
+.post-full .content pre:hover .copy-btn { opacity: 1; }
+
+.post-actions { display: flex; gap: .5rem; margin: 1.5rem 0; flex-wrap: wrap; }
+.post-actions button { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: .82rem; transition: .2s; font-family: inherit; font-weight: 500; }
+.post-actions button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.post-actions button.liked { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
+[data-theme="dark"] .post-actions button.liked { background: #450a0a; border-color: #7f1d1d; }
+
+.empty { text-align: center; padding: 4rem 1rem; }
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .4; }
+.empty p { color: var(--text-muted); font-size: 1rem; margin-bottom: .3rem; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--overlay); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; backdrop-filter: blur(4px); }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-card); border-radius: 16px; padding: 2rem; width: 100%; max-width: 900px; max-height: 92vh; overflow-y: auto; transition: .3s; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+.modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: .5rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-weight: 600; margin-bottom: .35rem; font-size: .85rem; color: var(--text-secondary); }
+.form-group input[type="text"] { width: 100%; padding: .65rem .8rem; border: 2px solid var(--editor-border); border-radius: 8px; font-size: .9rem; font-family: inherit; transition: .2s; background: var(--bg-card); color: var(--text); }
+.form-group input:focus { outline: none; border-color: var(--accent); }
+.form-actions { display: flex; gap: .8rem; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap; }
+
+.editor-wrapper { border: 2px solid var(--editor-border); border-radius: 10px; overflow: hidden; transition: border-color .2s; }
+.editor-wrapper:focus-within { border-color: var(--accent); }
+.editor-tabs { display: flex; background: var(--bg); border-bottom: 1px solid var(--border); }
+.editor-tab { padding: .55rem 1.2rem; font-size: .8rem; font-weight: 600; background: none; border: none; cursor: pointer; color: var(--text-muted); transition: .2s; font-family: inherit; border-bottom: 2px solid transparent; }
+.editor-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--bg-card); }
+.editor-tab:hover:not(.active) { color: var(--text); }
+.editor-body { position: relative; min-height: 350px; }
+.editor-pane { display: none; width: 100%; min-height: 350px; }
+.editor-pane.active { display: block; }
+#markdownEditor { width: 100%; min-height: 350px; padding: .9rem; border: none; outline: none; resize: vertical; font-size: .9rem; line-height: 1.7; background: var(--bg-card); color: var(--text); font-family: 'JetBrains Mono', 'Fira Code', monospace; tab-size: 2; }
+#markdownEditor::placeholder { color: var(--text-muted); }
+#previewPane { padding: .9rem; min-height: 350px; overflow-y: auto; line-height: 1.85; font-size: .95rem; background: var(--preview-bg); color: var(--text); }
+#previewPane p { margin-bottom: .8rem; }
+#previewPane h2 { font-size: 1.3rem; font-weight: 700; margin: 1.2rem 0 .5rem; }
+#previewPane h3 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 .4rem; }
+#previewPane blockquote { border-left: 4px solid var(--blockquote-border); background: var(--blockquote-bg); padding: .6rem 1rem; margin-bottom: .8rem; border-radius: 0 6px 6px 0; font-style: italic; }
+#previewPane ul, #previewPane ol { padding-left: 1.5rem; margin-bottom: .8rem; }
+#previewPane pre { background: var(--code-bg); padding: .8rem 1rem; border-radius: 6px; overflow-x: auto; font-size: .82rem; margin-bottom: .8rem; border: 1px solid var(--border); font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+#previewPane code { background: var(--code-bg); padding: .15rem .35rem; border-radius: 3px; font-size: .88em; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+#previewPane pre code { background: none; padding: 0; }
+#previewPane table { width: 100%; border-collapse: collapse; margin-bottom: .8rem; font-size: .85rem; }
+#previewPane th, #previewPane td { border: 1px solid var(--border); padding: .4rem .7rem; text-align: left; }
+#previewPane th { background: var(--accent-light); font-weight: 600; }
+#previewPane img { max-width: 100%; border-radius: 6px; }
+#previewPane hr { border: none; height: 1px; background: var(--border); margin: 1rem 0; }
+#previewPane a { color: var(--accent); }
+#previewPane input[type="checkbox"] { margin-right: .3rem; }
+
+.md-toolbar { display: flex; flex-wrap: wrap; gap: 1px; padding: .4rem .5rem; background: var(--bg); border-bottom: 1px solid var(--border); }
+.md-toolbar button { background: none; border: none; padding: .35rem .55rem; border-radius: 6px; cursor: pointer; font-size: .8rem; color: var(--text-secondary); font-weight: 500; transition: .15s; font-family: inherit; }
+.md-toolbar button:hover { background: var(--accent-light); color: var(--accent); }
+.md-toolbar .sep { width: 1px; background: var(--border); margin: .25rem .2rem; }
+
+.toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--toast-bg); color: var(--toast-text); padding: .7rem 1.5rem; border-radius: 10px; font-size: .85rem; box-shadow: 0 8px 24px rgba(0,0,0,.2); opacity: 0; transition: .3s; z-index: 2000; pointer-events: none; font-weight: 500; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.login-box { max-width: 340px; margin: 2rem auto; text-align: center; }
+.login-box h2 { margin-bottom: .4rem; }
+.login-box p { color: var(--text-muted); margin-bottom: 1.2rem; font-size: .9rem; }
+.login-box input { width: 100%; padding: .75rem; border: 2px solid var(--editor-border); border-radius: 8px; font-size: 1.2rem; text-align: center; letter-spacing: 6px; margin-bottom: 1rem; background: var(--bg-card); color: var(--text); font-family: inherit; }
+.login-box input:focus { outline: none; border-color: var(--accent); }
+.error-msg { color: #ef4444; font-size: .82rem; margin-top: .5rem; display: none; }
+.error-msg.show { display: block; }
+
+.comment-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+.comment-section h3 { font-size: 1.05rem; margin-bottom: 1rem; }
+.comment-input { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.comment-input input { flex: 1; min-width: 140px; padding: .5rem .7rem; border: 2px solid var(--editor-border); border-radius: 8px; font-size: .85rem; background: var(--bg-card); color: var(--text); font-family: inherit; }
+.comment-input input:focus { outline: none; border-color: var(--accent); }
+.comment { padding: .7rem 0; border-bottom: 1px solid var(--border); }
+.comment:last-child { border-bottom: none; }
+.comment-name { font-weight: 600; font-size: .85rem; }
+.comment-time { font-size: .72rem; color: var(--text-muted); margin-left: .5rem; }
+.comment-text { color: var(--text-secondary); font-size: .85rem; margin-top: .2rem; line-height: 1.5; }
+
+.counter-badge { display: inline-flex; align-items: center; gap: .25rem; font-size: .78rem; color: var(--text-muted); }
+
+footer { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-muted); font-size: .8rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+footer a { color: var(--text-muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+.footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: .3rem 1rem; margin-bottom: 1rem; }
+
+@media (max-width:640px) {
+  .container { padding: 1.2rem 1rem; }
+  nav { padding: 0 1rem; }
+  nav h1 { font-size: 1.1rem; }
+  .modal { padding: 1.2rem; padding-top: 1.5rem; }
+  .modal-title { font-size: 1.1rem; }
+  .editor-body, #markdownEditor, .editor-pane { min-height: 250px; }
+  #markdownEditor { min-height: 250px; }
+  #previewPane { min-height: 250px; }
+  .post-full h1 { font-size: 1.4rem; }
+  .md-toolbar button { font-size: .75rem; padding: .3rem .45rem; }
+  .card { padding: 1.2rem; }
+}
+</style>
+</head>
+<body data-theme="light">
+
+<nav>
+  <h1 onclick="showPage('home')">My <span>Mini Blog</span></h1>
+  <div class="nav-right">
+    <a href="#" onclick="showPage('home')">Beranda</a>
+    <button class="theme-btn" onclick="cycleTheme()" title="Ganti tema">🌓</button>
+    <button onclick="showPage('admin')" title="Panel Admin" style="font-size:1rem;">⚙️</button>
+  </div>
+</nav>
+
+<div class="container">
+
+<div id="pageHome" class="page active">
+  <h2 class="page-title"><span>Postingan</span> Terbaru</h2>
+  <div id="postList"><div class="empty"><div class="empty-icon">⏳</div><p>Memuat...</p></div></div>
+</div>
+
+<div id="pagePost" class="page">
+  <button class="btn btn-ghost btn-sm" onclick="showPage('home')" style="margin-bottom:1rem;">&larr; Kembali</button>
+  <div id="postFullContent" class="post-full card"></div>
+  <div id="postComments" class="card comment-section"></div>
+</div>
+
+<div id="pageAdmin" class="page">
+  <div id="adminPanel"></div>
+</div>
+
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="mailto:admin@budijoi.my.id" target="_blank">✉️ Email</a>
+    <a href="https://facebook.com/budijoiBBJ" target="_blank">📘 Facebook</a>
+    <a href="https://instagram.com/budijoi_eco" target="_blank">📸 Instagram</a>
+    <a href="https://threads.net/@budijoi_eco" target="_blank">🧵 Thread</a>
+    <a href="https://wa.me/6288224553181" target="_blank">💬 WhatsApp</a>
+  </div>
+  <div>👁️ Pengunjung: <strong id="visitorCount">0</strong></div>
+  <div style="margin-top:.3rem;">&copy; 2026 My Mini Blog</div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">📝 Tambah Postingan</div>
+    <div class="form-group">
+      <label for="postTitle">Judul</label>
+      <input type="text" id="postTitle" placeholder="Masukkan judul postingan...">
+    </div>
+    <div class="form-group">
+      <label>Konten — Markdown</label>
+      <div class="editor-wrapper">
+        <div class="md-toolbar">
+          <button onclick="mdToolbar('**','**')"><b>Bold</b></button>
+          <button onclick="mdToolbar('*','*')"><i>Italic</i></button>
+          <button onclick="mdToolbar('~~','~~')"><s>Strike</s></button>
+          <button onclick="mdToolbar('`','`')">Code</button>
+          <span class="sep"></span>
+          <button onclick="mdToolbar('## ','')">H2</button>
+          <button onclick="mdToolbar('### ','')">H3</button>
+          <span class="sep"></span>
+          <button onclick="mdToolbar('- ','')">• List</button>
+          <button onclick="mdToolbar('1. ','')">1. List</button>
+          <button onclick="mdToolbar('- [ ] ','')">☐ Task</button>
+          <span class="sep"></span>
+          <button onclick="mdToolbar('> ','')">Quote</button>
+          <button onclick="mdToolbar('```\n','\n```')">Pre</button>
+          <button onclick="mdToolbar('[','](url)')">Link</button>
+          <button onclick="mdToolbar('![','](url)')">Image</button>
+          <span class="sep"></span>
+          <button onclick="mdTable()">Table</button>
+          <button onclick="mdToolbar('---\n','')">HR</button>
+        </div>
+        <div class="editor-tabs">
+          <button class="editor-tab active" onclick="switchEditorTab('write',this)">✏️ Tulis</button>
+          <button class="editor-tab" onclick="switchEditorTab('preview',this)">👁️ Preview</button>
+        </div>
+        <div class="editor-body">
+          <div class="editor-pane active" id="writePane">
+            <textarea id="markdownEditor" placeholder="Tulis konten menggunakan Markdown..."></textarea>
+          </div>
+          <div class="editor-pane" id="previewPane"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" onclick="savePost()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'api.php';
+
+async function api(action, data = null, method) {
+  if (!method) method = data ? 'POST' : 'GET';
+  const opts = { method };
+  if (data) {
+    const form = new FormData();
+    for (let k in data) form.append(k, data[k]);
+    opts.body = form;
+  }
+  const res = await fetch(API + '?action=' + action + (method === 'GET' && data ? '&' + new URLSearchParams(data) : ''), opts);
+  return res.json();
+}
+
+function mdToHtml(md) {
+  if (!md) return '';
+  let html = md;
+  html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy">');
+  html = html.replace(/\[([^\]]*)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/~~(.+?)~~/g, '<s>$1</s>');
+  html = html.replace(/^---\s*$/gm, '<hr>');
+  html = html.replace(/^- \[ \] (.+)$/gm, '<li class="task"><input type="checkbox" disabled> $1</li>');
+  html = html.replace(/^- \[x\] (.+)$/gm, '<li class="task"><input type="checkbox" checked disabled> $1</li>');
+  html = html.replace(/^- \[X\] (.+)$/gm, '<li class="task"><input type="checkbox" checked disabled> $1</li>');
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<li value="$1">$2</li>');
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="lang-$1">$2</code></pre>');
+  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  html = html.replace(/^\|(.+)\|$/gm, function(m) {
+    const cells = m.split('|').filter(c => c.trim());
+    if (cells.length && cells[0].match(/^[-:]+\s*[-:| ]*$/)) return '';
+    return '<td>' + cells.join('</td><td>') + '</td>';
+  });
+  html = html.replace(/((?:<td>.*?<\/td>\s*)+)/g, '<tr>$1</tr>');
+  html = html.replace(/((?:<tr>.*?<\/tr>\s*)+)/g, '<table>$1</table>');
+  html = html.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/g, function(m) {
+    if (m.includes('value=')) return '<ol>' + m + '</ol>';
+    if (m.includes('task')) return '<ul class="task-list">' + m + '</ul>';
+    return '<ul>' + m + '</ul>';
+  });
+  html = html.replace(/((?:<blockquote>.*?<\/blockquote>\s*)+)/g, function(m) {
+    return m.replace(/<\/blockquote>\s*<blockquote>/g, '<br>');
+  });
+  const lines = html.split('\n');
+  let result = '', inBlock = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) { if (!inBlock) result += '<p><br></p>'; continue; }
+    if (line.startsWith('<') && (line.endsWith('>') || line.endsWith('</table>') || line.endsWith('</code></pre>'))) {
+      result += line + '\n';
+      if (line.startsWith('<table>') || line.startsWith('<pre>')) inBlock = true;
+      if (line.startsWith('</table>') || line.startsWith('</code></pre>')) inBlock = false;
+      continue;
+    }
+    if (inBlock) { result += line + '\n'; continue; }
+    if (line.startsWith('<h') || line.startsWith('<li') || line.startsWith('<blockquote') || line.startsWith('<ul') || line.startsWith('<ol') || line.startsWith('<hr') || line.startsWith('<tr') || line.startsWith('<table')) {
+      result += line + '\n'; continue;
+    }
+    result += '<p>' + line + '</p>\n';
+  }
+  return result;
+}
+
+let editingId = null;
+let currentViewPostId = null;
+let isLoggedIn = false;
+let editorMode = 'write';
+
+const themes = ['light', 'dark'];
+let themeIndex = parseInt(localStorage.getItem('miniblog_theme') || '0');
+document.body.dataset.theme = themes[themeIndex];
+
+function cycleTheme() {
+  themeIndex = (themeIndex + 1) % themes.length;
+  document.body.dataset.theme = themes[themeIndex];
+  localStorage.setItem('miniblog_theme', themeIndex.toString());
+}
+
+async function initVisitor() {
+  if (!sessionStorage.getItem('miniblog_visited')) {
+    const res = await api('visit');
+    if (res.ok) document.getElementById('visitorCount').textContent = res.count;
+    sessionStorage.setItem('miniblog_visited', 'true');
+  } else {
+    const res = await api('visitor');
+    if (res.ok) document.getElementById('visitorCount').textContent = res.count;
+  }
+}
+
+function formatDate(d) {
+  const date = new Date(d);
+  return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function stripHtml(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent || '';
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+async function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (el) el.classList.add('active');
+  if (page === 'home') await renderHome();
+  if (page === 'admin') await renderAdmin();
+}
+
+async function renderHome() {
+  const container = document.getElementById('postList');
+  const res = await api('list');
+  if (!res.ok || !res.posts.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>Belum ada postingan.</p><p style="font-size:.85rem;">Login ke Panel Admin untuk membuat postingan.</p></div>';
+    return;
+  }
+  const likesRes = await api('list');
+  const likesMap = {};
+  if (likesRes.ok) {
+    for (const p of likesRes.posts) {
+      const g = await api('get', { id: p.id }, 'GET');
+      if (g.ok) likesMap[p.id] = g.likes;
+    }
+  }
+  container.innerHTML = res.posts.slice().reverse().map((p, i) => {
+    const excerpt = p.content ? stripHtml(mdToHtml(p.content)).substring(0, 180).replace(/\s+\S*$/, '') : '';
+    return `<div class="card post-entrance" style="animation-delay:${i*0.04}s">
+      <div class="card-title"><a href="#" onclick="showPost('${p.id}')">${escHtml(p.title)}</a></div>
+      <div class="card-meta">
+        <span>📅 ${formatDate(p.date)}</span>
+        <span>❤️ ${likesMap[p.id] || 0}</span>
+      </div>
+      <div class="card-excerpt">${escHtml(excerpt)}</div>
+      <div style="margin-top:.7rem;"><a href="#" onclick="showPost('${p.id}')" style="color:var(--accent);font-size:.82rem;font-weight:600;text-decoration:none;">Baca selengkapnya &rarr;</a></div>
+    </div>`;
+  }).join('');
+}
+
+async function showPost(id) {
+  const res = await api('get', { id }, 'GET');
+  if (!res.ok) { showPage('home'); return; }
+  const post = res.post;
+  currentViewPostId = id;
+  let contentHtml = mdToHtml(post.content);
+  const temp = document.createElement('div');
+  temp.innerHTML = contentHtml;
+  temp.querySelectorAll('pre').forEach(pre => {
+    if (!pre.querySelector('.copy-btn')) {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = '📋 Salin';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        const code = pre.textContent;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(code).then(() => { btn.textContent = '✅ Disalin!'; setTimeout(() => { btn.textContent = '📋 Salin'; }, 2000); });
+        } else {
+          const ta = document.createElement('textarea'); ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          btn.textContent = '✅ Disalin!'; setTimeout(() => { btn.textContent = '📋 Salin'; }, 2000);
+        }
+      };
+      pre.appendChild(btn);
+    }
+  });
+  contentHtml = temp.innerHTML;
+  document.getElementById('postFullContent').innerHTML = `
+    <h1>${escHtml(post.title)}</h1>
+    <div class="meta">
+      <span>📅 ${formatDate(post.date)}</span>
+      <span class="counter-badge">❤️ <span id="likeCountDisplay">${res.likes}</span></span>
+      <span class="counter-badge">💬 <span id="commentCountDisplay">${res.comments.length}</span></span>
+    </div>
+    <div class="content">${contentHtml}</div>
+    <div class="post-actions">
+      <button id="likeBtn" onclick="toggleLike('${id}')" class="${res.liked?'liked':''}">${res.liked?'❤️':'🤍'} <span id="likeBtnText">${res.liked?'Suka':'Suka'}</span> <span id="likeCount">${res.likes}</span></button>
+      <button onclick="sharePost('${id}')">📤 Bagikan</button>
+      <button onclick="exportPostHTML('${id}')">📄 Export HTML</button>
+    </div>
+  `;
+  renderComments(id, res.comments);
+  showPage('post');
+}
+
+async function toggleLike(id) {
+  const res = await api('like', { id });
+  if (res.ok) {
+    document.getElementById('likeBtn').className = res.liked ? 'liked' : '';
+    document.getElementById('likeBtn').innerHTML = (res.liked ? '❤️' : '🤍') + ' <span>Suka</span> <span>' + res.count + '</span>';
+    document.getElementById('likeCountDisplay').textContent = res.count;
+  }
+}
+
+function sharePost(id) {
+  const title = document.querySelector('.post-full h1')?.textContent || '';
+  const textContent = document.querySelector('.post-full .content')?.textContent || '';
+  const text = `${title}\n\n${textContent.substring(0,100)}...\n\nDibagikan dari My Mini Blog`;
+  if (navigator.share) {
+    navigator.share({ title, text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('Teks berhasil disalin!'));
+  } else {
+    showToast('Gunakan browser modern untuk fitur share.');
+  }
+}
+
+async function exportPostHTML(id) {
+  const res = await api('get', { id }, 'GET');
+  if (!res.ok) return;
+  const post = res.post;
+  const contentHtml = mdToHtml(post.content);
+  const fullHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escHtml(post.title)} — My Mini Blog</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; color: #1a1a2e; line-height: 1.85; background: #fff; }
+h1 { font-size: 1.8rem; }
+.meta { font-size: .82rem; color: #999; margin-bottom: 1.5rem; }
+.content p { margin-bottom: 1.1rem; }
+.content h2 { font-size: 1.4rem; margin: 1.8rem 0 .6rem; }
+.content h3 { font-size: 1.2rem; margin: 1.5rem 0 .5rem; }
+.content blockquote { border-left: 4px solid #4f46e5; background: #eef2ff; padding: .8rem 1.2rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0; }
+.content pre { background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
+.content code { background: #f1f5f9; padding: .15rem .4rem; border-radius: 4px; }
+.content pre code { background: none; padding: 0; }
+.content ul, .content ol { margin-bottom: 1rem; padding-left: 1.6rem; }
+.content img { max-width: 100%; border-radius: 8px; margin: 1rem 0; }
+.content a { color: #4f46e5; }
+.content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+.content th, .content td { border: 1px solid #e5e7eb; padding: .5rem .8rem; }
+.content th { background: #eef2ff; }
+footer { text-align: center; padding: 2rem 0; color: #999; font-size: .8rem; border-top: 1px solid #e5e7eb; margin-top: 2rem; }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1>Catatan Perjalanan</h1>
-<p style="color:#8892a4;font-size:.85em;margin-top:6px">My Home Server - STB B860H</p>
-<a class="nav-link" href="/">&larr; Kembali ke Dashboard</a>
-</div>
-<div class="post">
-<h2>Selamat Datang di My Home Server</h2>
-<div class="date">13 Juni 2026</div>
-<p>STB B860H dengan eMMC rusak berfungsi penuh sebagai server rumahan. Berkat Docker, semua layanan berjalan di container terisolasi tanpa dependency conflict.</p>
-<p style="margin-top:10px">Spesifikasi:</p>
-<ul style="margin-top:6px">
-<li><strong>SOC:</strong> Amlogic S905X (ARM Cortex-A53)</li>
-<li><strong>RAM:</strong> 1 GB DDR3 + ZRAM 512MB + SWAP 1GB</li>
-<li><strong>Penyimpanan:</strong> SD Card</li>
-<li><strong>Sistem:</strong> Armbian + Docker</li>
-</ul>
-</div>
-<div class="post">
-<h2>Layanan Berjalan di Docker</h2>
-<div class="date">13 Juni 2026</div>
-<ul>
-<li><strong>Dashboard Monitor</strong> - Flask container (port 8080)</li>
-<li><strong>FileBrowser</strong> - filebrowser/filebrowser (port 8081)</li>
-<li><strong>CCTV NVR</strong> - ccrisan/motioneye (port 8765)</li>
-<li><strong>Cloudflare Tunnel</strong> - cloudflare/cloudflared</li>
-<li><strong>Terminal</strong> - tsl0922/ttyd + btop (port 7681)</li>
-</ul>
-</div>
-<div class="post">
-<h2>Mengelola Container</h2>
-<div class="date">13 Juni 2026</div>
-<p>Semua service dikelola via docker-compose di /opt/homeserver:</p>
-<ul>
-<li><code>docker-compose ps</code> - lihat status container</li>
-<li><code>docker-compose logs -f</code> - lihat log real-time</li>
-<li><code>docker-compose restart [service]</code> - restart service tertentu</li>
-<li><code>docker-compose pull</code> - update semua image</li>
-</ul>
-</div>
-<div class="footer"><p>My Home Server &mdash; Dibuat dengan penuh dedikasi</p></div>
-</div>
+<h1>${escHtml(post.title)}</h1>
+<div class="meta">📅 ${formatDate(post.date)}</div>
+<div class="content">${contentHtml}</div>
+<footer>Diterbitkan di My Mini Blog &mdash; ${formatDate(post.date)}</footer>
+</body>
+</html>`;
+  const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = post.title.replace(/[^a-zA-Z0-9]/g, '_') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('File HTML berhasil diunduh!');
+}
+
+async function exportAllHTML() {
+  const res = await api('list');
+  if (!res.ok || !res.posts.length) { showToast('Tidak ada postingan untuk diexport.'); return; }
+  let allHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Mini Blog — Archive</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; color: #1a1a2e; line-height: 1.85; background: #fff; }
+h1 { font-size: 2rem; text-align: center; }
+.post { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid #e5e7eb; }
+.post:last-child { border-bottom: none; }
+.meta { font-size: .82rem; color: #999; margin-bottom: 1rem; text-align: center; }
+.content p { margin-bottom: 1.1rem; }
+.content h2 { font-size: 1.4rem; margin: 1.8rem 0 .6rem; }
+.content h3 { font-size: 1.2rem; margin: 1.5rem 0 .5rem; }
+.content blockquote { border-left: 4px solid #4f46e5; background: #eef2ff; padding: .8rem 1.2rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0; }
+.content pre { background: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
+.content code { background: #f1f5f9; padding: .15rem .4rem; border-radius: 4px; }
+.content pre code { background: none; padding: 0; }
+.content ul, .content ol { margin-bottom: 1rem; padding-left: 1.6rem; }
+.content img { max-width: 100%; border-radius: 8px; margin: 1rem 0; }
+.content a { color: #4f46e5; }
+.content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+.content th, .content td { border: 1px solid #e5e7eb; padding: .5rem .8rem; }
+.content th { background: #eef2ff; }
+footer { text-align: center; padding: 2rem 0; color: #999; font-size: .8rem; border-top: 1px solid #e5e7eb; margin-top: 2rem; }
+h2 a { color: #1a1a2e; text-decoration: none; }
+</style>
+</head>
+<body>
+<h1>📝 My Mini Blog</h1>
+<p style="text-align:center;color:#999;margin-bottom:2rem;">Arsip lengkap semua postingan</p>`;
+  for (const p of res.posts.slice().reverse()) {
+    const g = await api('get', { id: p.id }, 'GET');
+    if (!g.ok) continue;
+    const contentHtml = mdToHtml(g.post.content);
+    allHtml += `<div class="post">
+  <h2><a name="${p.id}">${escHtml(p.title)}</a></h2>
+  <div class="meta">📅 ${formatDate(p.date)} &nbsp;·&nbsp; ❤️ ${g.likes} &nbsp;·&nbsp; 💬 ${g.comments.length}</div>
+  <div class="content">${contentHtml}</div>
+</div>`;
+  }
+  allHtml += `<footer>&copy; 2026 My Mini Blog</footer></body></html>`;
+  const blob = new Blob([allHtml], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my_mini_blog_archive.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Semua postingan berhasil diexport sebagai HTML!');
+}
+
+function renderComments(postId, comments) {
+  const container = document.getElementById('postComments');
+  container.innerHTML = `
+    <h3>💬 Komentar (${comments.length})</h3>
+    <div class="comment-input">
+      <input type="text" id="commentName" placeholder="Nama..." maxlength="30">
+      <input type="text" id="commentText" placeholder="Tulis komentar..." maxlength="500" onkeydown="if(event.key==='Enter')addComment('${postId}')">
+      <button class="btn btn-primary btn-sm" onclick="addComment('${postId}')">Kirim</button>
+    </div>
+    <div id="commentList">
+      ${comments.length ? comments.map(c => `
+        <div class="comment">
+          <span class="comment-name">${escHtml(c.name)}</span>
+          <span class="comment-time">${formatDate(c.date)}</span>
+          <div class="comment-text">${escHtml(c.text)}</div>
+        </div>
+      `).join('') : '<p style="color:var(--text-muted);font-size:.85rem;">Belum ada komentar. Jadilah yang pertama!</p>'}
+    </div>
+  `;
+}
+
+async function addComment(postId) {
+  const name = document.getElementById('commentName').value.trim() || 'Anonim';
+  const text = document.getElementById('commentText').value.trim();
+  if (!text) { showToast('Teks komentar tidak boleh kosong.'); return; }
+  const res = await api('comment', { id: postId, name, text });
+  if (res.ok) {
+    document.getElementById('commentText').value = '';
+    await showPost(postId);
+  }
+}
+
+async function renderAdmin() {
+  const panel = document.getElementById('adminPanel');
+  const authRes = await api('checkAuth');
+  isLoggedIn = authRes.auth;
+  if (!isLoggedIn) {
+    panel.innerHTML = `
+      <div class="login-box card">
+        <h2>⚙️ Panel Admin</h2>
+        <p>Masukkan PIN untuk mengelola postingan.</p>
+        <input type="password" id="pinInput" placeholder="PIN" maxlength="6" onkeydown="if(event.key==='Enter')login()">
+        <button class="btn btn-primary" onclick="login()" style="width:100%;">Masuk</button>
+        <div class="error-msg" id="loginError">PIN salah. Coba lagi.</div>
+      </div>
+    `;
+    return;
+  }
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+      <h2 class="page-title" style="margin-bottom:0;">📂 <span>Kelola</span> Postingan</h2>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openModal()">+ Tambah Baru</button>
+        <button class="btn btn-ghost" onclick="exportAllHTML()">📄 Export Semua</button>
+        <button class="btn btn-secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <div id="adminPostList"></div>
+  `;
+  await renderAdminPosts();
+}
+
+async function renderAdminPosts() {
+  const container = document.getElementById('adminPostList');
+  if (!container) return;
+  const res = await api('list');
+  if (!res.ok || !res.posts.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>Belum ada postingan.</p><p style="font-size:.85rem;">Klik "Tambah Baru" untuk membuat postingan.</p></div>';
+    return;
+  }
+  let html = '';
+  for (const p of res.posts.slice().reverse()) {
+    const g = await api('get', { id: p.id }, 'GET');
+    const plain = g.ok ? stripHtml(mdToHtml(g.post.content)) : '';
+    const excerpt = plain.substring(0, 120).replace(/\s+\S*$/, '');
+    html += `<div class="card">
+      <div class="card-title">${escHtml(p.title)}</div>
+      <div class="card-meta">
+        <span>📅 ${formatDate(p.date)}</span>
+        <span>❤️ ${g.ok ? g.likes : 0}</span>
+        <span>💬 ${g.ok ? g.comments.length : 0}</span>
+      </div>
+      <div class="card-excerpt">${escHtml(excerpt)}</div>
+      <div class="card-actions">
+        <button class="btn btn-primary btn-sm" onclick="editPost('${p.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')">🗑 Hapus</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPostHTML('${p.id}')">📄 Export HTML</button>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+async function login() {
+  const pin = document.getElementById('pinInput').value;
+  const res = await api('login', { pin });
+  if (res.ok) {
+    isLoggedIn = true;
+    await renderAdmin();
+  } else {
+    document.getElementById('loginError').classList.add('show');
+  }
+}
+
+async function logout() {
+  await api('logout');
+  isLoggedIn = false;
+  await renderAdmin();
+}
+
+function switchEditorTab(tab, btn) {
+  editorMode = tab;
+  document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
+  if (tab === 'write') {
+    document.getElementById('writePane').classList.add('active');
+  } else {
+    document.getElementById('previewPane').classList.add('active');
+    updatePreview();
+  }
+}
+
+function updatePreview() {
+  const md = document.getElementById('markdownEditor').value;
+  document.getElementById('previewPane').innerHTML = mdToHtml(md);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const editor = document.getElementById('markdownEditor');
+  if (editor) {
+    editor.addEventListener('input', function() {
+      if (editorMode === 'preview') updatePreview();
+    });
+  }
+});
+
+function mdToolbar(before, after) {
+  const ta = document.getElementById('markdownEditor');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const text = ta.value;
+  const selected = text.substring(start, end);
+  const insertion = before + selected + after;
+  ta.value = text.substring(0, start) + insertion + text.substring(end);
+  ta.focus();
+  ta.selectionStart = start + before.length;
+  ta.selectionEnd = start + before.length + selected.length;
+  if (editorMode === 'preview') updatePreview();
+}
+
+function mdTable() {
+  const ta = document.getElementById('markdownEditor');
+  const table = '\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n';
+  const pos = ta.selectionStart;
+  ta.value = ta.value.substring(0, pos) + table + ta.value.substring(ta.selectionEnd);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = pos + table.length;
+  if (editorMode === 'preview') updatePreview();
+}
+
+function getEditorMD() {
+  return document.getElementById('markdownEditor').value;
+}
+
+function setEditorMD(md) {
+  document.getElementById('markdownEditor').value = md;
+  if (editorMode === 'preview') updatePreview();
+}
+
+function clearEditor() {
+  document.getElementById('markdownEditor').value = '';
+  if (editorMode === 'preview') document.getElementById('previewPane').innerHTML = '';
+}
+
+function openModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = '📝 Tambah Postingan';
+  document.getElementById('postTitle').value = '';
+  clearEditor();
+  const writeTab = document.querySelector('.editor-tab');
+  if (writeTab) switchEditorTab('write', writeTab);
+  document.getElementById('modalOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('postTitle').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  editingId = null;
+}
+
+async function editPost(id) {
+  const res = await api('get', { id }, 'GET');
+  if (!res.ok) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = '✏️ Edit Postingan';
+  document.getElementById('postTitle').value = res.post.title;
+  setEditorMD(res.post.content);
+  const writeTab = document.querySelector('.editor-tab');
+  if (writeTab) switchEditorTab('write', writeTab);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+async function savePost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const content = getEditorMD().trim();
+  if (!title) { showToast('Judul wajib diisi.'); return; }
+  if (!content) { showToast('Konten wajib diisi.'); return; }
+  const data = { title, content };
+  if (editingId) data.id = editingId;
+  const res = await api('save', data);
+  if (res.ok) {
+    closeModal();
+    await renderAdmin();
+    showToast(editingId ? 'Postingan berhasil diperbarui.' : 'Postingan berhasil ditambahkan.');
+  } else {
+    showToast(res.error || 'Gagal menyimpan.');
+  }
+}
+
+async function deletePost(id) {
+  if (!confirm('Yakin ingin menghapus postingan ini beserta komentarnya?')) return;
+  const res = await api('delete', { id });
+  if (res.ok) {
+    await renderAdmin();
+    showToast('Postingan berhasil dihapus.');
+  }
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+  const modal = document.getElementById('modalOverlay');
+  if (modal.classList.contains('show') && e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    savePost();
+  }
+});
+
+initVisitor();
+renderHome();
+</script>
 </body>
 </html>
