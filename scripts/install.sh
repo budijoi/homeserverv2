@@ -151,10 +151,34 @@ ok "Kernel parameters dioptimalkan"
 section "3" "MENYALIN FILE PROJECT"
 
 mkdir -p "$HOMESERVER_DIR"
-mkdir -p "/storage/My Document" "/storage/My Music" "/storage/My Pictures" "/storage/My Videos" "/storage/My Videos/NVR"
+mkdir -p "/storage/My Document" "/storage/My Music" "/storage/My Pictures" "/storage/My Videos" "/storage/My Videos/NVR" "/storage/Blog"
 
 rsync -a --delete "$SCRIPT_DIR/" "$HOMESERVER_DIR/" 2>/dev/null || cp -r "$SCRIPT_DIR/"* "$HOMESERVER_DIR/" 2>/dev/null
 ok "File project disalin ke $HOMESERVER_DIR"
+
+if [ ! -f "/storage/Blog/selamat-datang.md" ]; then
+  cat > "/storage/Blog/selamat-datang.md" << 'BLOGEOF'
+# Selamat Datang di My Home Server
+
+STB B860H dengan eMMC rusak berfungsi penuh sebagai server rumahan berkat Armbian dan Docker.
+
+**Spesifikasi:**
+- **SOC:** Amlogic S905X (ARM Cortex-A53)
+- **RAM:** 1 GB DDR3 + ZRAM 512MB + SWAP 1GB
+- **Penyimpanan:** SD Card
+- **Sistem:** Armbian + Docker
+
+**Layanan Berjalan:**
+- Dashboard Monitor (Flask) — port 8080
+- FileBrowser — port 8081
+- CCTV NVR motionEye — port 8765
+- Terminal + BTOP — port 7681
+- Cloudflare Tunnel
+
+Postingan ini dibuat otomatis. Anda bisa edit atau hapus via FileBrowser.
+BLOGEOF
+  ok "Postingan blog awal dibuat"
+fi
 
 cd "$HOMESERVER_DIR" || { err "Gagal masuk direktori"; exit 1; }
 

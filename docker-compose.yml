@@ -18,7 +18,7 @@ services:
       - /sys:/host/sys:ro
       - /:/host/root:ro
       - /etc/hostname:/host/etc/hostname:ro
-      - ./blog:/app/blog:ro
+      - /storage/Blog:/app/blog_content:ro
     environment:
       - HOST_PREFIX=/host
       - TZ=${TZ:-Asia/Jakarta}

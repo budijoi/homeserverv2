@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog - My Home Server</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e6ed;padding:20px}
+.container{max-width:800px;margin:0 auto}
+.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#131a2b,#1a2340);border-radius:16px;margin-bottom:24px;border:1px solid #1e2a45}
+.header h1{font-size:1.5em;background:linear-gradient(135deg,#00d4ff,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .sub{color:#8892a4;font-size:.85em;margin-top:6px}
+.nav-link{display:inline-block;margin-top:10px;color:#00d4ff;text-decoration:none;font-size:.85em}
+.nav-link:hover{color:#00ff88}
+.manage-link{display:inline-block;margin-left:16px;color:#ffd93d;text-decoration:none;font-size:.82em}
+.manage-link:hover{color:#ffed7a}
+.post{background:#131a2b;border-radius:14px;padding:24px;margin-bottom:16px;border:1px solid #1e2a45;transition:border-color .2s}
+.post:hover{border-color:#00d4ff}
+.post h2{font-size:1.15em;margin-bottom:6px}
+.post h2 a{color:#00d4ff;text-decoration:none}
+.post h2 a:hover{color:#00ff88}
+.post .date{font-size:.78em;color:#5a6a8a;margin-bottom:8px}
+.post p{font-size:.9em;line-height:1.7;color:#c0c8d6}
+.empty{text-align:center;color:#5a6a8a;padding:40px;font-size:.9em}
+.empty .tip{color:#8892a4;margin-top:10px;font-size:.85em}
+.footer{text-align:center;padding:20px;color:#5a6a8a;font-size:.8em}
+@media(max-width:600px){body{padding:12px}.header{padding:20px 14px}.header h1{font-size:1.2em}.post{padding:16px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Blog</h1>
+<div class="sub">Catatan dan tutorial My Home Server</div>
+<a class="nav-link" href="/">&larr; Dashboard</a>
+<a class="manage-link" id="manage-link" href="#" target="_blank">&#9998; Kelola via FileBrowser</a>
+</div>
+{% if posts %}
+{% for p in posts %}
+<div class="post">
+<h2><a href="/blog/{{ p.slug }}">{{ p.title }}</a></h2>
+<div class="date">{{ p.date }}</div>
+{{ p.html|safe|truncate(300) }}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty">
+Belum ada postingan.
+<div class="tip">Buat file .md di folder Blog via FileBrowser untuk menambah postingan.</div>
+</div>
+{% endif %}
+<div class="footer"><p>My Home Server &mdash; Kelola postingan via FileBrowser</p></div>
+</div>
+<script>
+(function(){var h=window.location.hostname||'localhost';document.getElementById('manage-link').href='http://'+h+':8081/Blog'})();
+</script>
+</body>
+</html>

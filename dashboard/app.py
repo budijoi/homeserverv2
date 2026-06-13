@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import os, time, threading, subprocess
-from flask import Flask, jsonify, render_template, send_from_directory
+import os, time, threading, subprocess, glob, markdown
+from flask import Flask, jsonify, render_template, send_from_directory, abort
 
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 P = os.environ.get('HOST_PREFIX', '')
+BLOG_DIR = os.environ.get('BLOG_DIR', os.path.join(BASE_DIR, 'blog_content'))
 
 def pjoin(*paths):
     return os.path.join(P, *paths) if P else os.path.join(*paths)
@@ -197,13 +198,47 @@ def api_stats():
 def index():
     return render_template('index.html')
 
+def parse_post(filepath):
+    try:
+        with open(filepath, encoding='utf-8') as f:
+            content = f.read()
+    except:
+        return None
+    lines = content.split('\n')
+    title = 'Untitled'
+    body = content
+    for i, line in enumerate(lines):
+        if line.startswith('# '):
+            title = line[2:].strip()
+            body = '\n'.join(lines[i+1:])
+            break
+    html = markdown.markdown(body, extensions=['fenced_code', 'codehilite'])
+    return {'title': title, 'html': html, 'slug': os.path.splitext(os.path.basename(filepath))[0]}
+
+def get_posts():
+    posts = []
+    pattern = os.path.join(BLOG_DIR, '*.md')
+    for fp in sorted(glob.glob(pattern), key=os.path.getmtime, reverse=True):
+        p = parse_post(fp)
+        if p:
+            p['date'] = time.strftime('%d %B %Y', time.localtime(os.path.getmtime(fp)))
+            posts.append(p)
+    return posts
+
 @app.route('/blog')
-@app.route('/blog/<path:filename>')
-def blog(filename=None):
-    d = os.path.join(BASE_DIR, 'blog')
-    if filename:
-        return send_from_directory(d, filename)
-    return send_from_directory(d, 'index.html')
+def blog_list():
+    return render_template('blog.html', posts=get_posts())
+
+@app.route('/blog/<slug>')
+def blog_post(slug):
+    fp = os.path.join(BLOG_DIR, slug + '.md')
+    if not os.path.isfile(fp):
+        abort(404)
+    p = parse_post(fp)
+    if not p:
+        abort(404)
+    p['date'] = time.strftime('%d %B %Y', time.localtime(os.path.getmtime(fp)))
+    return render_template('blog_post.html', post=p)
 
 if __name__ == '__main__':
     t = threading.Thread(target=monitor, daemon=True)
