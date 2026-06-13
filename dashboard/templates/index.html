@@ -58,7 +58,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0e1
 .modal .whatsapp-btn{display:block;text-align:center;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:600;margin-top:14px}
 .modal .whatsapp-btn:hover{opacity:.85}
 .modal .note{text-align:center;font-size:.78em;color:#5a6a8a;margin-top:12px}
-@media(max-width:600px){body{padding:12px}.stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:14px}.card .circle{width:70px;height:70px}.card .circle svg{width:70px;height:70px}.card .circle svg circle{cx:35;cy:35;r:30}.card .circle .value{font-size:1em}.nav-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){body{padding:10px}.header{padding:18px 14px}.header h1{font-size:1.2em}.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}.card{padding:12px}.card .circle{width:62px;height:62px}.card .circle svg{width:62px;height:62px}.card .circle svg circle{cx:31;cy:31;r:26}.card .circle .value{font-size:.85em}.card .circle .sub-value{font-size:.55em}.card .label{font-size:.68em;margin-bottom:6px}.card .detail{font-size:.72em}.network-card{padding:14px 16px}.network-card .bar-group .bar-label{font-size:.76em}.nav-grid{grid-template-columns:repeat(3,1fr);gap:8px}.nav-btn{padding:12px 8px;font-size:.76em}.nav-btn .icon{font-size:1.5em;margin-bottom:4px}.total-row{font-size:.7em;flex-wrap:wrap;gap:4px}.modal{padding:20px;width:95%}}
+@media(max-width:400px){.stats-grid{grid-template-columns:repeat(2,1fr);gap:6px}.card{padding:10px}.card .circle{width:52px;height:52px}.card .circle svg{width:52px;height:52px}.card .circle svg circle{cx:26;cy:26;r:21}.card .circle .value{font-size:.75em}.nav-grid{grid-template-columns:repeat(3,1fr);gap:6px}.nav-btn{padding:10px 6px;font-size:.7em}.nav-btn .icon{font-size:1.2em}}
 </style>
 </head>
 <body>
@@ -86,9 +87,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0e1
 
 <div class="nav-grid">
 <a class="nav-btn blog" href="/blog" target="_blank"><span class="icon">&#128221;</span><span>Blog</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Artikel</span></a>
-<a class="nav-btn files" href="http://IP_SERVER:8081" target="_blank"><span class="icon">&#128193;</span><span>FileBrowser</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Manajemen File</span></a>
-<a class="nav-btn nvr" href="http://IP_SERVER:8765" target="_blank"><span class="icon">&#128250;</span><span>NVR</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">CCTV</span></a>
-<a class="nav-btn status" href="http://IP_SERVER:7681" target="_blank"><span class="icon">&#128187;</span><span>Status</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Terminal</span></a>
+<a class="nav-btn files" id="nav-files" href="#" target="_blank"><span class="icon">&#128193;</span><span>FileBrowser</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Manajemen File</span></a>
+<a class="nav-btn nvr" id="nav-nvr" href="#" target="_blank"><span class="icon">&#128250;</span><span>NVR</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">CCTV</span></a>
+<a class="nav-btn status" id="nav-status" href="#" target="_blank"><span class="icon">&#128187;</span><span>Status</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Terminal</span></a>
 <button class="nav-btn donate" onclick="openDonasi()"><span class="icon">&#128155;</span><span>Donasi</span><span style="font-size:.75em;color:#5a6a8a;margin-top:2px">Dukung Kami</span></button>
 </div>
 </div>
@@ -98,11 +99,11 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0e1
 <button class="close" onclick="closeDonasi()">&times;</button>
 <h2>&#128155; Support My Home Server</h2>
 <p style="text-align:center;font-size:.82em;color:#8892a4;margin-bottom:16px">Terima kasih telah menggunakan My Home Server.<br>Dukungan Anda sangat berarti untuk pengembangan.</p>
-<div class="payment"><div class="bank">DANA</div><div class="number">085323073037</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Budi Joko</div></div>
-<div class="payment"><div class="bank">Mandiri</div><div class="number">1310014031126</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Budi Joko</div></div>
-<div class="payment"><div class="bank">BNI</div><div class="number">2027537451</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Budi Joko</div></div>
+<div class="payment"><div class="bank">DANA</div><div class="number">085323073037</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Moh Agus Budiman</div></div>
+<div class="payment"><div class="bank">Mandiri</div><div class="number">1310014031126</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Moh Agus Budiman</div></div>
+<div class="payment"><div class="bank">BNI</div><div class="number">2027537451</div><div style="font-size:.78em;color:#5a6a8a;margin-top:2px">a.n. Moh Agus Budiman</div></div>
 <div class="qris"><img src="https://raw.githubusercontent.com/budijoi/budijoi.github.io/refs/heads/main/QRDANA2.JPG" alt="QRIS DANA" loading="lazy"><div style="font-size:.75em;color:#5a6a8a;margin-top:4px">Scan QRIS via DANA</div></div>
-<a class="whatsapp-btn" href="https://wa.me/6285323073037?text=Halo%20kak%2C%20saya%20mau%20konfirmasi%20donasi%20untuk%20My%20Home%20Server" target="_blank">&#128242; Konfirmasi via WhatsApp</a>
+<a class="whatsapp-btn" href="https://wa.me/6288224553181?text=Halo%20kak%2C%20saya%20mau%20konfirmasi%20donasi%20untuk%20My%20Home%20Server" target="_blank">&#128242; Konfirmasi via WhatsApp</a>
 <div class="note">Setelah transfer, konfirmasi via WhatsApp ya :)</div>
 </div>
 </div>
@@ -151,7 +152,8 @@ function fb(s){if(!s)return 0;const v=parseFloat(s);if(s.includes('TB'))return v
 function openDonasi(){document.getElementById('donasi-modal').classList.add('active')}
 function closeDonasi(){document.getElementById('donasi-modal').classList.remove('active')}
 document.getElementById('donasi-modal').addEventListener('click',function(e){if(e.target===this)closeDonasi()});
-updateStats();setInterval(updateStats,3000);
+function fixNavLinks(){const ip=document.getElementById('ip').textContent;if(ip&&ip!='N/A'&&ip!='-'){document.getElementById('nav-files').href='http://'+ip+':8081';document.getElementById('nav-nvr').href='http://'+ip+':8765';document.getElementById('nav-status').href='http://'+ip+':7681'}}
+updateStats();setInterval(updateStats,3000);setTimeout(fixNavLinks,500);
 </script>
 </body>
 </html>

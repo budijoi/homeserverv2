@@ -84,10 +84,17 @@ def get_net_bytes(iface):
 
 def detect_iface():
     try:
+        r = subprocess.run(['ip', 'route', 'show', 'default'], capture_output=True, text=True, timeout=3)
+        parts = r.stdout.strip().split()
+        if len(parts) >= 5:
+            return parts[4]
+    except:
+        pass
+    try:
         for line in open(pjoin('proc', 'net', 'dev')):
             if ':' in line:
                 iface = line.split(':')[0].strip()
-                if iface != 'lo':
+                if iface not in ('lo', 'docker0') and not iface.startswith(('br-', 'veth', 'dummy')):
                     return iface
     except:
         pass
@@ -193,7 +200,7 @@ def index():
 @app.route('/blog')
 @app.route('/blog/<path:filename>')
 def blog(filename=None):
-    d = os.path.join(os.path.dirname(BASE_DIR), 'blog')
+    d = os.path.join(BASE_DIR, 'blog')
     if filename:
         return send_from_directory(d, filename)
     return send_from_directory(d, 'index.html')

@@ -9,11 +9,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 HOMESERVER_DIR="/opt/homeserver"
 SWAP_FILE="/swapfile"
 ZRAM_SIZE="${ZRAM_SIZE:-512M}"
-SWAP_SIZE="${SWAP_SIZE:-2048}"
+SWAP_SIZE="${SWAP_SIZE:-1024}"
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-BLUE='\033[0;34m'; MAGENTA='\033[0;35m'; CYAN='\033[0;36m'
-WHITE='\033[1;37m'; NC='\033[0m'
+RED=$'\033[0;31m'; GREEN=$'\033[0;32m'; YELLOW=$'\033[1;33m'
+BLUE=$'\033[0;34m'; MAGENTA=$'\033[0;35m'; CYAN=$'\033[0;36m'
+WHITE=$'\033[1;37m'; NC=$'\033[0m'
 
 FAILED=0
 
@@ -56,7 +56,7 @@ banner
 cat <<DESC
   ${WHITE}Akan menginstall:${NC}
   ${GREEN}1.${NC} Docker + Docker Compose
-  ${GREEN}2.${NC} ZRAM 512MB + SWAP 2GB + Optimasi S905X
+  ${GREEN}2.${NC} ZRAM 512MB + SWAP 1GB + Optimasi S905X
   ${GREEN}3.${NC} Dashboard Flask (port 8080)
   ${GREEN}4.${NC} FileBrowser (port 8081)
   ${GREEN}5.${NC} CCTV NVR motionEye (port 8765)
@@ -129,6 +129,8 @@ if ! swapon --show 2>/dev/null | grep -v zram | grep -q /swapfile; then
   ok "SWAP ${SWAP_SIZE}MB aktif"
 fi
 
+run "Menginstal btop (monitor CLI)" apt-get install -y btop 2>/dev/null || true
+
 cat > /etc/sysctl.d/99-homeserver.conf << 'SYSCTL'
 vm.swappiness=10
 vm.vfs_cache_pressure=50
@@ -165,30 +167,124 @@ if [ -f .env.example ] && [ ! -f .env ]; then
 fi
 
 run "Membangun image dashboard (Flask)" docker compose build dashboard
+run "Membangun image ttyd + btop" docker compose build ttyd
 
-run "Menarik image dari registry" docker compose pull
+info "Menarik image dari registry (satu per satu agar error tidak blokir yang lain)..."
+for img in filebrowser/filebrowser:latest cloudflare/cloudflared:latest; do
+  docker pull "$img" 2>&1 || warn "Gagal menarik $img (akan dicoba ulang saat up)"
+done
+ok "Proses pull selesai"
 
 # Initialize FileBrowser database
 info "Inisialisasi FileBrowser user..."
 mkdir -p /opt/homeserver/configs/filebrowser-data
+chmod 777 /opt/homeserver/configs/filebrowser-data
 if [ ! -f /opt/homeserver/configs/filebrowser-data/filebrowser.db ]; then
   docker run --rm \
     -v /opt/homeserver/configs/filebrowser-data:/database \
     filebrowser/filebrowser \
-    filebrowser config init --database=/database/filebrowser.db 2>/dev/null
+    filebrowser config init --database=/database/filebrowser.db || warn "Init db gagal"
   docker run --rm \
     -v /opt/homeserver/configs/filebrowser-data:/database \
     filebrowser/filebrowser \
-    filebrowser users add admin moch1234 --perm.admin --database=/database/filebrowser.db 2>/dev/null
-  ok "User FileBrowser: admin / moch1234"
+    filebrowser users add admin admin12345678 --perm.admin --database=/database/filebrowser.db || warn "Tambah user gagal"
+  ok "User FileBrowser: admin / admin12345678"
 fi
 
-run "Menjalankan semua container" docker compose up -d
+info "Menjalankan container satu per satu..."
+for svc in dashboard filebrowser ttyd cloudflared; do
+  docker compose up -d --no-deps "$svc" 2>&1 || warn "$svc gagal start (lanjut ke service berikutnya)"
+  sleep 2
+done
+ok "Semua container diproses"
 
-sleep 5
+# =================== 5. MOTIONEYE NATIVE ===================
+section "5" "CCTV NVR (motionEye) — NATIVE"
 
-# =================== 5. CLOUDFLARE TUNNEL ===================
-section "5" "CLOUDFLARE TUNNEL (OPSIONAL)"
+info "Menginstal motionEye langsung di host (karena image Docker hanya untuk amd64)..."
+
+if command -v meyectl &>/dev/null; then
+  ok "motionEye sudah terinstal"
+else
+  run "Menginstal dependensi build" apt-get install -y python3-dev gcc libjpeg62-turbo-dev libcurl4-openssl-dev libssl-dev python3-pip python3-venv
+  run "Menginstal motionEye via pip" python3 -m pip install motioneye
+  info "Menjalankan motioneye_init..."
+  python3 -m motioneye.bin.motioneye_init --skip-apt-update 2>&1 || motioneye_init --skip-apt-update 2>&1 || warn "motioneye_init gagal (mungkin sudah pernah diinit)"
+  if command -v meyectl &>/dev/null; then
+    ok "motionEye terinstal"
+  else
+    err "motionEye gagal diinstal"
+  fi
+fi
+
+if command -v meyectl &>/dev/null; then
+  mkdir -p /etc/motioneye /var/lib/motioneye /storage/My\ Videos/NVR
+
+  if [ ! -f /etc/motioneye/motioneye.conf ]; then
+    warn "motioneye.conf tidak ditemukan, membuat minimal..."
+    cat > /etc/motioneye/motioneye.conf << 'MEYCONF'
+conf_path /etc/motioneye
+log_level 4
+log_file /var/log/motioneye/motioneye.log
+motion_root /etc/motioneye
+pid_file /var/run/motioneye.pid
+port 8765
+listen 0.0.0.0
+MEYCONF
+    mkdir -p /var/log/motioneye
+  fi
+
+  if [ ! -f /etc/motioneye/camera-1.conf ]; then
+    cat > /etc/motioneye/camera-1.conf << 'CAMEOF'
+camera_id = 1
+camera_name = Camera Depan
+netcam_url = http://192.168.101.6/video.mjpg
+# Sesuaikan user/pass jika kamera membutuhkan auth
+target_dir = /storage/My Videos/NVR
+width = 1280
+height = 720
+framerate = 10
+text_left = CAM 1
+text_right = %Y-%m-%d %T
+movie_codec = mp4
+movie_fps = 10
+movie_quality = 75
+emulate_motion = true
+threshold = 1500
+event_gap = 60
+output_pictures = off
+output_debug_pictures = off
+CAMEOF
+    ok "Kamera 192.168.101.6 ditambahkan"
+  fi
+
+  cat > /etc/systemd/system/motioneye.service << 'MEYEOF'
+[Unit]
+Description=motionEye NVR - My Home Server
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/meyectl startserver -c /etc/motioneye/motioneye.conf
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+MEYEOF
+  systemctl daemon-reload
+  systemctl enable motioneye.service
+  systemctl start motioneye.service
+  sleep 3
+  if systemctl is-active motioneye.service &>/dev/null; then
+    ok "motionEye NVR berjalan di port 8765"
+  else
+    err "motionEye service gagal. Cek: journalctl -u motioneye -n 20"
+  fi
+fi
+
+# =================== 6. CLOUDFLARE TUNNEL ===================
+section "6" "CLOUDFLARE TUNNEL (OPSIONAL)"
 
 if confirm "Ingin konfigurasi Cloudflare Tunnel?"; then
   echo -e -n "  ${WHITE}Domain Anda (contoh: server.example.com): ${NC}"
@@ -248,19 +344,19 @@ else
   info "Cloudflare dilewati"
 fi
 
-# =================== 6. FIX NAVIGATION IP ===================
+# =================== 7. FIX NAVIGATION IP ===================
 IP=$(get_ip)
 if [ -n "$IP" ]; then
   sed -i "s/IP_SERVER/$IP/g" "$HOMESERVER_DIR/dashboard/templates/index.html"
   ok "IP $IP terpasang di navigasi dashboard"
 fi
 
-# =================== 7. STATUS ===================
+# =================== 8. STATUS ===================
 section "STATUS" "CEK LAYANAN"
 
 sleep 3
 echo ""
-for svc in dashboard filebrowser motioneye cloudflared ttyd; do
+for svc in dashboard filebrowser cloudflared ttyd; do
   if docker ps --format '{{.Names}}' 2>/dev/null | grep -qi "$svc"; then
     echo -e "  ${GREEN}[RUNNING]${NC} $svc"
   else
@@ -269,6 +365,12 @@ for svc in dashboard filebrowser motioneye cloudflared ttyd; do
     docker compose logs --tail=5 "$svc" 2>/dev/null | while read line; do echo "    $line"; done
   fi
 done
+
+if systemctl is-active motioneye.service &>/dev/null; then
+  echo -e "  ${GREEN}[RUNNING]${NC} motioneye (native)"
+else
+  echo -e "  ${RED}[STOPPED]${NC} motioneye (native)"
+fi
 
 # =================== SUMMARY ===================
 section "SELESAI" "INSTALASI SELESAI!"
@@ -284,9 +386,9 @@ echo ""
 echo -e "  ${WHITE}Akses layanan:${NC}"
 echo -e "  ${CYAN}  Dashboard :${NC} http://${IP}:8080"
 echo -e "  ${CYAN}  Blog      :${NC} http://${IP}:8080/blog"
-echo -e "  ${CYAN}  FileBrowser:${NC} http://${IP}:8081 (admin / moch1234)"
-echo -e "  ${CYAN}  NVR CCTV  :${NC} http://${IP}:8765 (admin / moch1234)"
-echo -e "  ${CYAN}  Terminal  :${NC} http://${IP}:7681 (admin / moch1234)"
+echo -e "  ${CYAN}  FileBrowser:${NC} http://${IP}:8081 (admin / admin12345678)"
+echo -e "  ${CYAN}  NVR CCTV  :${NC} http://${IP}:8765 (admin / admin12345678)"
+echo -e "  ${CYAN}  Terminal  :${NC} http://${IP}:7681 (admin / admin12345678)"
 echo ""
 echo -e "  ${YELLOW}Manajemen:${NC}"
 echo -e "  cd $HOMESERVER_DIR && docker compose ps"

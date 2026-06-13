@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-restart: &restart
   restart: unless-stopped
 
@@ -20,6 +18,7 @@ services:
       - /sys:/host/sys:ro
       - /:/host/root:ro
       - /etc/hostname:/host/etc/hostname:ro
+      - ./blog:/app/blog:ro
     environment:
       - HOST_PREFIX=/host
       - TZ=${TZ:-Asia/Jakarta}
@@ -37,26 +36,7 @@ services:
       - /storage:/srv
       - ./configs/filebrowser.json:/.filebrowser.json:ro
       - ./configs/filebrowser-data:/database
-    environment:
-      - FB_BASEURL=/srv
     mem_limit: 64m
-    <<: [*restart, *network]
-
-  # ==========================================
-  # CCTV NVR (motionEye)
-  # ==========================================
-  motioneye:
-    image: ccrisan/motioneye:master-arm64
-    ports:
-      - "8765:8765"
-    volumes:
-      - ./configs/motioneye:/etc/motioneye
-      - /storage/My Videos/NVR:/var/lib/motioneye
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - TZ=${TZ:-Asia/Jakarta}
-    mem_limit: 256m
-    privileged: true
     <<: [*restart, *network]
 
   # ==========================================
@@ -74,8 +54,8 @@ services:
   # TTYD + BTOP (Terminal via Web)
   # ==========================================
   ttyd:
-    image: tsl0922/ttyd:latest
-    command: ttyd -p 7681 -c ${TTYD_USER:-admin}:${TTYD_PASS:-moch1234} btop
+    build: ./ttyd
+    command: ttyd -p 7681 -c ${TTYD_USER:-admin}:${TTYD_PASS:-admin12345678} btop
     ports:
       - "7681:7681"
     pid: "host"
