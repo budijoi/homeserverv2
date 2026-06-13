@@ -37,7 +37,7 @@ services:
       - /storage:/srv
       - ./configs/filebrowser.json:/config/settings.json:ro
       - ./configs/filebrowser-data:/database
-      - ./dashboard/templates:/srv/Dashboard:ro
+      - ./dashboard/templates:/srv/Dashboard
     mem_limit: 64m
     <<: [*restart, *network]
 
