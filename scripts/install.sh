@@ -151,7 +151,11 @@ ok "Kernel parameters dioptimalkan"
 section "3" "MENYALIN FILE PROJECT"
 
 mkdir -p "$HOMESERVER_DIR"
-mkdir -p "/storage/My Document" "/storage/My Music" "/storage/My Pictures" "/storage/My Videos" "/storage/My Videos/NVR" "/storage/Blog"
+mkdir -p "/storage/My Document" "/storage/My Music" "/storage/My Pictures" "/storage/My Videos" "/storage/My Videos/NVR"
+for d in "/storage/Blog" "/storage/My Document" "/storage/My Music" "/storage/My Pictures" "/storage/My Videos" "/storage/My Videos/NVR"; do
+  mkdir -p "$d"
+  chmod 777 "$d"
+done
 
 rsync -a --delete "$SCRIPT_DIR/" "$HOMESERVER_DIR/" 2>/dev/null || cp -r "$SCRIPT_DIR/"* "$HOMESERVER_DIR/" 2>/dev/null
 ok "File project disalin ke $HOMESERVER_DIR"
