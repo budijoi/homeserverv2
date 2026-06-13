@@ -85,10 +85,10 @@ def get_net_bytes(iface):
 
 def detect_iface():
     try:
-        r = subprocess.run(['ip', 'route', 'show', 'default'], capture_output=True, text=True, timeout=3)
-        parts = r.stdout.strip().split()
-        if len(parts) >= 5:
-            return parts[4]
+        for line in open(pjoin('proc', 'net', 'route')):
+            parts = line.strip().split()
+            if len(parts) >= 2 and parts[1] == '00000000':
+                return parts[0]
     except:
         pass
     try:
