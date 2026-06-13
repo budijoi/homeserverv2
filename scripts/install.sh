@@ -183,11 +183,11 @@ if [ ! -f /opt/homeserver/configs/filebrowser-data/filebrowser.db ]; then
   docker run --rm \
     -v /opt/homeserver/configs/filebrowser-data:/database \
     filebrowser/filebrowser \
-    filebrowser config init --database=/database/filebrowser.db || warn "Init db gagal"
+    config init --database=/database/filebrowser.db || warn "Init db gagal"
   docker run --rm \
     -v /opt/homeserver/configs/filebrowser-data:/database \
     filebrowser/filebrowser \
-    filebrowser users add admin admin12345678 --perm.admin --database=/database/filebrowser.db || warn "Tambah user gagal"
+    users add admin admin12345678 --perm.admin --database=/database/filebrowser.db || warn "Tambah user gagal"
   ok "User FileBrowser: admin / admin12345678"
 fi
 
