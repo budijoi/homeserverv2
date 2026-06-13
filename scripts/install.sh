@@ -158,6 +158,7 @@ for d in "/storage/Blog" "/storage/My Document" "/storage/My Music" "/storage/My
 done
 
 rsync -a --delete "$SCRIPT_DIR/" "$HOMESERVER_DIR/" 2>/dev/null || cp -r "$SCRIPT_DIR/"* "$HOMESERVER_DIR/" 2>/dev/null
+chmod -R a+w "$HOMESERVER_DIR/dashboard/templates"
 ok "File project disalin ke $HOMESERVER_DIR"
 
 if [ ! -f "/storage/Blog/selamat-datang.md" ]; then
